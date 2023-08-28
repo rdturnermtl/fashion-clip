@@ -174,7 +174,7 @@ class FashionCLIP:
 
         return model, preprocessing, hash
 
-    def encode_images(self, images: Union[List[str], List[PIL.Image.Image]], batch_size: int):
+    def encode_images(self, images: Union[List[str], List[PIL.Image.Image]], batch_size: int, verbose: bool=True):
         def transform_fn(el):
              imgs = el['image'] if isinstance(el['image'][0], PIL.Image.Image) else [Image().decode_example(_) for _ in el['image']] 
              return self.preprocess(images=imgs, return_tensors='pt')
@@ -188,7 +188,7 @@ class FashionCLIP:
         dataset.set_transform(transform_fn)
         dataloader = DataLoader(dataset, batch_size=batch_size)
         image_embeddings = []
-        pbar = tqdm(total=len(images) // batch_size, position=0)
+        pbar = tqdm(total=len(images) // batch_size, position=0, disable=not verbose)
         with torch.no_grad():
             for batch in dataloader:
                 batch = {k:v.to(self.device) for k,v in batch.items()}
